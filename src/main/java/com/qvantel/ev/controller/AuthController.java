@@ -33,7 +33,7 @@ public class AuthController {
                         request.getUsername(),
                         request.getPassword()
                 );
-        log.info("User: " + request.getUsername() + ", Password: " + request.getPassword());
+        //log.info("User: " + request.getUsername() + ", Password: " + request.getPassword());
         return ResponseEntity.ok(response);
     }
 }
