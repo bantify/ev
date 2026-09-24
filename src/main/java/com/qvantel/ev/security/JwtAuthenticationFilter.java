@@ -6,28 +6,21 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
-public class JwtAuthenticationFilter
-        extends OncePerRequestFilter {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private final UserDetailsService userDetailsService;
 
-    public JwtAuthenticationFilter(
-            JwtService jwtService,
-            UserDetailsService userDetailsService) {
-
+    public JwtAuthenticationFilter(JwtService jwtService) {
         this.jwtService = jwtService;
-        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -37,9 +30,13 @@ public class JwtAuthenticationFilter
             FilterChain filterChain)
             throws ServletException, IOException {
 
-        String authorizationHeader =
-                request.getHeader("Authorization");
+        // ---------------------------------------------------------
+        // 1. Get Authorization header
+        // ---------------------------------------------------------
 
+        String authorizationHeader = request.getHeader("Authorization");
+
+        // No Authorization header
         if (authorizationHeader == null
                 || !authorizationHeader.startsWith("Bearer ")) {
 
@@ -47,33 +44,49 @@ public class JwtAuthenticationFilter
             return;
         }
 
-        String token =
-                authorizationHeader.substring(7);
+        // ---------------------------------------------------------
+        // 2. Extract JWT token
+        // ---------------------------------------------------------
+
+        String token = authorizationHeader.substring(7);
 
         try {
 
-            String username =
-                    jwtService.extractUsername(token);
+            // -----------------------------------------------------
+            // 3. Extract username from JWT
+            // -----------------------------------------------------
+
+            String username = jwtService.extractUsername(token);
+
+            // -----------------------------------------------------
+            // 4. Check whether user is already authenticated
+            // -----------------------------------------------------
 
             if (username != null
-                    && SecurityContextHolder
-                    .getContext()
-                    .getAuthentication() == null) {
+                    && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                UserDetails userDetails =
-                        userDetailsService
-                                .loadUserByUsername(username);
+                // -------------------------------------------------
+                // 5. Validate JWT
+                // -------------------------------------------------
 
-                if (jwtService.isTokenValid(
-                        token,
-                        userDetails.getUsername())) {
+                if (jwtService.isTokenValid(token, username)) {
+
+                    // ---------------------------------------------
+                    // 6. Create Spring Security Authentication
+                    // ---------------------------------------------
 
                     UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(
-                                    userDetails,
+                                    username,
                                     null,
-                                    userDetails.getAuthorities()
+                                    List.of(
+                                            new SimpleGrantedAuthority("ROLE_USER")
+                                    )
                             );
+
+                    // ---------------------------------------------
+                    // 7. Put authentication into SecurityContext
+                    // ---------------------------------------------
 
                     SecurityContextHolder
                             .getContext()
@@ -83,11 +96,21 @@ public class JwtAuthenticationFilter
 
         } catch (Exception e) {
 
-            // Invalid JWT.
-            // The request will remain unauthenticated.
+            // -----------------------------------------------------
+            // Invalid / expired / malformed JWT
+            // -----------------------------------------------------
+
+            SecurityContextHolder.clearContext();
+
+            // We don't return here.
+            // Spring Security will decide whether the endpoint
+            // requires authentication.
         }
+
+        // ---------------------------------------------------------
+        // 8. Continue request
+        // ---------------------------------------------------------
 
         filterChain.doFilter(request, response);
     }
 }
-
