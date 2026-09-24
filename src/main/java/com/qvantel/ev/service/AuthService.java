@@ -3,6 +3,7 @@ package com.qvantel.ev.service;
 
 import com.qvantel.ev.dto.LoginResponse;
 import com.qvantel.ev.security.JwtService;
+import com.qvantel.ev.exception.InvalidCredentialsException;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -36,7 +37,7 @@ public class AuthService {
                         password,
                         storedPassword)) {
 
-            throw new RuntimeException(
+            throw new InvalidCredentialsException(
                     "Invalid username or password"
             );
         }
