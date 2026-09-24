@@ -1,8 +1,8 @@
-package com.qvantel.controller;
+package com.qvantel.ev.controller;
 
-import com.qvantel.dto.LoginRequest;
-import com.qvantel.dto.LoginResponse;
-import com.qvantel.service.AuthService;
+import com.qvantel.ev.dto.LoginRequest;
+import com.qvantel.ev.dto.LoginResponse;
+import com.qvantel.ev.service.AuthService;
 
 import jakarta.validation.Valid;
 

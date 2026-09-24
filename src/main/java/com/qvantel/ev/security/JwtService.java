@@ -1,4 +1,4 @@
-package com.qvantel.security;
+package com.qvantel.ev.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

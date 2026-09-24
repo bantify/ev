@@ -1,4 +1,4 @@
-package com.qvantel.dto;
+package com.qvantel.ev.dto;
 
 import jakarta.validation.constraints.NotBlank;
 

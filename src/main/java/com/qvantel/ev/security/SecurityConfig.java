@@ -1,4 +1,4 @@
-package com.qvantel.security;
+package com.qvantel.ev.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

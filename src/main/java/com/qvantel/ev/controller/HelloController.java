@@ -1,4 +1,4 @@
-package com.qvantel.controller;
+package com.qvantel.ev.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

@@ -1,8 +1,8 @@
 
-package com.qvantel.service;
+package com.qvantel.ev.service;
 
-import com.qvantel.dto.LoginResponse;
-import com.qvantel.security.JwtService;
+import com.qvantel.ev.dto.LoginResponse;
+import com.qvantel.ev.security.JwtService;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
